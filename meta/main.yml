@@ -1,0 +1,17 @@
+---
+galaxy_info:
+  author: William Hearn
+  description: Install and configures Pachyderm for Data Science related tooling.
+  license: MIT
+  min_ansible_version: 2.0
+  platforms:
+  - name: EL
+    versions:
+      - 7
+  galaxy_tags:
+    - kubernetes
+    - kubectl
+    - data science
+    - pachyderm
+
+dependencies: []

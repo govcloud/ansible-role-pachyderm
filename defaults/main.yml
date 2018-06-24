@@ -1,0 +1,8 @@
+---
+pach_ver: v1.7.0
+pach_name: pach
+pach_fullname: "{{pach_name}}-1.7.0"
+pach_platform: linux-amd64
+pach_checksums:
+  v1.7.0:
+    linux-amd64: sha256:c3d268e472dae044309a7cb7a3c09aa702ab905939e9b6b1747688b6c79cfce4

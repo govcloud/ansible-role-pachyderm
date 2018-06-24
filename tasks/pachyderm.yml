@@ -1,0 +1,68 @@
+---
+- name: check for installation of pach
+  become: yes
+  stat:
+    path: "/usr/local/bin/pachctl"
+  changed_when: false
+  register: pach_dir
+
+- when: not pach_dir.stat.exists
+  block:
+    - name: download...
+      become: yes
+      get_url:
+        url: 'https://github.com/pachyderm/pachyderm/releases/download/v1.7.0rc2/pachctl_1.7.0rc2_linux_amd64.tar.gz'
+        dest: "/tmp/{{ pach_tgz }}"
+        checksum: "{{ pach_checksum }}"
+        mode: 0644
+
+    - name: make install dir
+      become: yes
+      file:
+        path: '/usr/local/bin'
+        state: directory
+        mode: 0755
+
+    - name: unarchive
+      become: yes
+      unarchive:
+        extra_opts: '--strip-components=1'
+        copy: no
+        src: "/tmp/{{ pach_tgz }}"
+        dest: '/usr/local/bin'
+        creates: "/usr/local/bin/pachctl"
+
+  always:
+    - name: cleanup...
+      become: yes
+      file:
+        path: "/tmp/{{ pach_tgz }}"
+        state: absent
+
+- name: Initialize  Helm
+  shell: helm init
+  environment:
+    PATH: $PATH:/usr/local/bin
+  args:
+    executable: /bin/bash
+
+- name: Install Pachyderm via Helm
+  shell: helm install --namespace pachyderm --name pachyderm --set pachd.image.tag=1.7.0rc2 --set pachd.worker.tag=1.7.0rc2 stable/pachyderm
+  environment:
+    PATH: $PATH:/usr/local/bin
+  args:
+    executable: /bin/bash
+
+- name: Allow services to act as admin general bypass for Pachyderm
+  shell: pachctl deploy local --dashboard-only --namespace pachyderm
+  environment:
+    PATH: $PATH:/usr/local/bin
+  args:
+    executable: /bin/bash
+
+- name: Allow services to act as admin general bypass for Pachyderm
+  shell: kubectl create clusterrolebinding serviceaccounts-cluster-admin --clusterrole=cluster-admin --group=system:serviceaccounts
+  environment:
+    PATH: $PATH:/usr/local/bin
+  args:
+    executable: /bin/bash

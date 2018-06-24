@@ -1,0 +1,3 @@
+---
+pach_tgz: '{{pach_name}}.tar.gz'
+pach_checksum: '{{pach_checksums[pach_ver][pach_platform]}}'
